@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenho uma pergunta ❤️</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#ff9ecf,#ffd6e8);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+
+.card{
+    background:white;
+    padding:40px;
+    border-radius:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+    text-align:center;
+    width:90%;
+    max-width:500px;
+}
+
+h1{
+    color:#ff4f8b;
+    margin-bottom:15px;
+}
+
+p{
+    color:#555;
+    margin-bottom:25px;
+}
+
+.buttons{
+    position:relative;
+    height:100px;
+}
+
+button{
+    border:none;
+    padding:15px 30px;
+    border-radius:30px;
+    font-size:18px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+#sim{
+    background:#ff4f8b;
+    color:white;
+}
+
+#sim:hover{
+    transform:scale(1.05);
+}
+
+#nao{
+    background:#eee;
+    color:#444;
+    position:absolute;
+    margin-left:20px;
+}
+
+.formulario{
+    display:none;
+    margin-top:20px;
+    text-align:left;
+}
+
+.formulario label{
+    display:block;
+    margin-top:15px;
+    margin-bottom:5px;
+    font-weight:bold;
+}
+
+.formulario input,
+.formulario select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+}
+
+.enviar{
+    width:100%;
+    margin-top:20px;
+    background:#ff4f8b;
+    color:white;
+}
+
+.sucesso{
+    display:none;
+    text-align:center;
+}
+
+.sucesso h2{
+    color:#ff4f8b;
+    margin-bottom:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+    <div id="pergunta">
+        <h1>❤️ Tenho uma pergunta ❤️</h1>
+
+        <p>
+            Você aceita sair comigo?
+        </p>
+
+        <div class="buttons">
+            <button id="sim">Sim 😍</button>
+            <button id="nao">Não 😢</button>
+        </div>
+    </div>
+
+    <div class="formulario" id="formulario">
+    <h1>Perfeito! ❤️</h1>
+
+    <label>Qual dia?</label>
+    <input id="dia" type="date">
+
+    <label>Qual horário?</label>
+    <input id="hora" type="time">
+
+    <label>O que você quer comer?</label>
+    <select id="comida">
+        <option>Pizza 🍕</option>
+        <option>Hambúrguer 🍔</option>
+        <option>Japonesa 🍣</option>
+        <option>Churrasco 🥩</option>
+        <option>Você escolhe ❤️</option>
+    </select>
+
+    <button class="enviar" onclick="salvarResposta()">
+        Confirmar ❤️
+    </button>
+</div>
+
+    <div class="sucesso" id="sucesso">
+        <h2>❤️ Encontro confirmado ❤️</h2>
+        <p>
+            Agora é só combinar os detalhes.
+        </p>
+    </div>
+
+</div>
+
+<script>
+
+const botaoNao = document.getElementById("nao");
+
+function fugir() {
+
+    const largura = window.innerWidth - 120;
+    const altura = window.innerHeight - 80;
+
+    const x = Math.random() * largura;
+    const y = Math.random() * altura;
+
+    botaoNao.style.position = "fixed";
+    botaoNao.style.left = x + "px";
+    botaoNao.style.top = y + "px";
+}
+
+botaoNao.addEventListener("mouseover", fugir);
+botaoNao.addEventListener("touchstart", function(e){
+    e.preventDefault();
+    fugir();
+});
+
+document.getElementById("sim").addEventListener("click", function(){
+
+    document.getElementById("pergunta").style.display = "none";
+    document.getElementById("formulario").style.display = "block";
+
+});
+
+function enviarResposta(){
+
+    document.getElementById("formulario").style.display = "none";
+    document.getElementById("sucesso").style.display = "block";
+
+}
+
+</script>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBJYPpJDpXcHwF9eE8jMy1jIa-8vYQg9j4",
+  authDomain: "teste-361e1.firebaseapp.com",
+  projectId: "teste-361e1",
+  storageBucket: "teste-361e1.firebasestorage.app",
+  messagingSenderId: "129865078178",
+  appId: "1:129865078178:web:885ecd756a77b787e38efb",
+  measurementId: "G-FZME27ZZLZ"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.salvarResposta = async function() {
+
+  try {
+
+    const dia = document.getElementById("dia").value;
+    const hora = document.getElementById("hora").value;
+    const comida = document.getElementById("comida").value;
+
+    await addDoc(collection(db, "respostas"), {
+      dia: dia,
+      hora: hora,
+      comida: comida,
+      dataEnvio: new Date()
+    });
+
+    document.getElementById("formulario").style.display = "none";
+    document.getElementById("sucesso").style.display = "block";
+
+  } catch (erro) {
+
+    console.error(erro);
+    alert("Erro ao enviar. Aperte F12 e veja o Console.");
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
